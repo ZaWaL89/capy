@@ -23,25 +23,22 @@ jobs:
         run: |
           ls -l android/app/src/main/assets/roadcastd
           ls -l android/app/src/main/jniLibs/arm64-v8a/libroadcast_client.so
-          
-      - name: Bump build number above 783
+
+      - name: Bump build number
         run: |
-          sed -i 's/^version: .*/version: 0.26.0+800/' pubspec.yaml
-             
+          sed -i 's/^version: .*/version: 0.26.0+801/' pubspec.yaml
+
+      - name: Create .env with your cloud
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" >> .env
+
       - run: flutter pub get
 
       - name: Generate platform keystore
         run: bash scripts/generate_platform_keystore.sh
 
-      - name: Point the car app at your cloud
-        run: |
-          {
-            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}"
-            echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY }}"
-            echo "SUPABASE_FUNCTIONS_URL=${{ secrets.SUPABASE_URL }}/functions/v1"
-          } >> android/local.properties
-
-      - run: flutter build apk --release
+      - run: flutter build apk --release --dart-define-from-file=.env
 
       - uses: actions/upload-artifact@v4
         with:
