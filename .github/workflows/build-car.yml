@@ -5,6 +5,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_FUNCTIONS_URL: ${{ secrets.SUPABASE_URL }}/functions/v1
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.SUPABASE_PUBLISHABLE_KEY }}
+      CLOUD_SYNC_ENABLED: "true"
     steps:
       - uses: actions/checkout@v4
 
@@ -26,19 +31,36 @@ jobs:
 
       - name: Bump build number
         run: |
-          sed -i 's/^version: .*/version: 0.26.0+801/' pubspec.yaml
+          sed -i 's/^version: .*/version: 0.26.0+802/' pubspec.yaml
 
-      - name: Create .env with your cloud
+      - name: Create .env
         run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" >> .env
+          echo "SUPABASE_URL=$SUPABASE_URL" > .env
+          echo "SUPABASE_PUBLISHABLE_KEY=$SUPABASE_ANON_KEY" >> .env
+          echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" >> .env
 
       - run: flutter pub get
 
       - name: Generate platform keystore
         run: bash scripts/generate_platform_keystore.sh
 
+      - name: Write native cloud config
+        run: |
+          touch android/local.properties
+          {
+            echo "SUPABASE_FUNCTIONS_URL=$SUPABASE_FUNCTIONS_URL"
+            echo "SUPABASE_URL=$SUPABASE_URL"
+            echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
+            echo "CLOUD_SYNC_ENABLED=true"
+          } >> android/local.properties
+
       - run: flutter build apk --release --dart-define-from-file=.env
+
+      - name: Show cloud config baked into the build
+        run: |
+          f=$(find . -name BuildConfig.java -path "*release*" | head -1)
+          echo "BuildConfig: $f"
+          grep -E "SUPABASE_(FUNCTIONS_)?URL|CLOUD_SYNC" "$f" || true
 
       - uses: actions/upload-artifact@v4
         with:
