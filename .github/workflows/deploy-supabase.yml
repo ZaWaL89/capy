@@ -12,5 +12,5 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase functions deploy device-pairing --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-      - run: supabase functions deploy privacy --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+      - run: supabase functions deploy device-pairing --project-ref trfzobaufaclvxpoqvqp
+      - run: supabase functions deploy privacy --project-ref trfzobaufaclvxpoqvqp
