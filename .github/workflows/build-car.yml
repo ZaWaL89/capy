@@ -23,10 +23,11 @@ jobs:
         run: |
           ls -l android/app/src/main/assets/roadcastd
           ls -l android/app/src/main/jniLibs/arm64-v8a/libroadcast_client.so
-
+          
       - name: Bump build number above 783
-        run: sed -i 's/^version: .*/version: 0.26.0+800/' pubspec.yaml
-
+        run: |
+          sed -i 's/^version: .*/version: 0.26.0+800/' pubspec.yaml
+             
       - run: flutter pub get
 
       - name: Generate platform keystore
