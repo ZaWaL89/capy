@@ -300,7 +300,10 @@ class TelemetryCloudUploader(
         perStream: ConcurrentHashMap<String, Int>
     ) {
         val sessions = sessionDao.dirtySessions(Int.MAX_VALUE)
-            .filter { it.vehicleId != UNASSIGNED && it.vehicleId.isNotBlank() }
+            .filter {
+                (it.vehicleId != UNASSIGNED && it.vehicleId.isNotBlank()) ||
+                    canonical(it.vehicleId) != it.vehicleId
+            }
         if (sessions.isEmpty()) return
         for (chunk in sessions.chunked(chunkSize)) {
             val sinkRows = chunk.map { entity ->
