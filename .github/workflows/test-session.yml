@@ -1,0 +1,23 @@
+name: Test session upload
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      URL: ${{ secrets.SUPABASE_URL }}
+      KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+    steps:
+      - name: Same keys in every row
+        run: |
+          curl -s -w "\nHTTP %{http_code}\n" -X POST "$URL/rest/v1/session?on_conflict=vehicle_id,id" \
+            -H "apikey: $KEY" -H "Content-Type: application/json" \
+            -H "Prefer: resolution=merge-duplicates, return=minimal" \
+            -d '[{"id":"t1","vehicle_id":"v","kind":"k","status":"s","started_at_utc_millis":1,"started_at_elapsed_nanos":1,"no_longer_reducible":false,"created_at_utc_millis":1,"updated_at_utc_millis":1},{"id":"t2","vehicle_id":"v","kind":"k","status":"s","started_at_utc_millis":1,"started_at_elapsed_nanos":1,"no_longer_reducible":false,"created_at_utc_millis":1,"updated_at_utc_millis":1}]'
+      - name: Different keys in rows
+        run: |
+          curl -s -w "\nHTTP %{http_code}\n" -X POST "$URL/rest/v1/session?on_conflict=vehicle_id,id" \
+            -H "apikey: $KEY" -H "Content-Type: application/json" \
+            -H "Prefer: resolution=merge-duplicates, return=minimal" \
+            -d '[{"id":"t1","vehicle_id":"v","kind":"k","status":"s","started_at_utc_millis":1,"started_at_elapsed_nanos":1,"no_longer_reducible":false,"created_at_utc_millis":1,"updated_at_utc_millis":1,"end_reason":"x"},{"id":"t2","vehicle_id":"v","kind":"k","status":"s","started_at_utc_millis":1,"started_at_elapsed_nanos":1,"no_longer_reducible":false,"created_at_utc_millis":1,"updated_at_utc_millis":1}]'
