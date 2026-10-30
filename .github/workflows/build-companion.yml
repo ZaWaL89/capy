@@ -22,16 +22,24 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Bump version
+        run: |
+          sed -i 's/^version: .*/version: 0.1.2+900/' pubspec.yaml
+          grep '^version' pubspec.yaml
+
       - name: Create .env
         run: |
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
           echo "SUPABASE_PUBLISHABLE_KEY=${{ secrets.SUPABASE_PUBLISHABLE_KEY }}" >> .env
-   
+          echo "CLOUD_SYNC_ENABLED=true" >> .env
+
       - name: Add google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+
       - run: flutter pub get
+
       - run: flutter build apk --release --dart-define-from-file=.env
 
       - uses: actions/upload-artifact@v4
