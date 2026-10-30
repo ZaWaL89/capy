@@ -69,20 +69,19 @@ class HttpCloudSink(
         merge: Boolean,
     ) {
         if (rows.isEmpty()) return
-           withContext(Dispatchers.IO) {
-               val url = restUrl(table, conflictColumns, merge)
-               val strip = table !in preserveNullsTables
-               // PostgREST rejects a batch whose rows carry different key sets
-               // (PGRST102), so rows that drop different nulls go in separate requests.
-               val groups: Collection<List<Map<String, Any?>>> = if (strip) {
-                   rows.groupBy { row -> row.filterValues { it != null }.keys.toSet() }.values
-               } else {
-                   listOf(rows)
-               }
-               for (group in groups) {
-                   request("POST", url, buildPayload(group, stripNulls = strip), merge)
-               }
-           }
+        withContext(Dispatchers.IO) {
+            val url = restUrl(table, conflictColumns, merge)
+            val strip = table !in preserveNullsTables
+            // PostgREST rejects a batch whose rows carry different key sets
+            // (PGRST102), so rows that drop different nulls go in separate requests.
+            val groups: Collection<List<Map<String, Any?>>> = if (strip) {
+                rows.groupBy { row -> row.filterValues { it != null }.keys.toSet() }.values
+            } else {
+                listOf(rows)
+            }
+            for (group in groups) {
+                request("POST", url, buildPayload(group, stripNulls = strip), merge)
+            }
         }
     }
 
