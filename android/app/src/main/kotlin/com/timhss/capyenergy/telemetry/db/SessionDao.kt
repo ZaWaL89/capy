@@ -408,7 +408,7 @@ interface SessionDao {
      * and `uncorrectable` uploads with its marker (plan section 4) — holding
      * either would strand rows no sweep will ever revisit.
      */
-    @Query("SELECT * FROM session WHERE dirty = 1 AND timeState != 'pending' LIMIT :limit")
+    @Query("SELECT * FROM session WHERE dirty = 1 AND (timeState != 'pending' OR kind = 'CHARGE') LIMIT :limit")
     fun dirtySessions(limit: Int): List<SessionEntity>
 
     @Query("SELECT COUNT(*) FROM session WHERE dirty = 1 AND timeState != 'pending'")
