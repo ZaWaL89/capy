@@ -37,7 +37,8 @@ interface TripSessionStore {
         startOdometerKm: Float?,
         startGear: Int?,
         startLocation: LocationSnapshot?,
-        status: String = "ACTIVE"
+        status: String = "ACTIVE",
+        startAmbientTempC: Float? = null
     ): String
 
     fun closeTripSession(
@@ -112,7 +113,7 @@ class TripSessionDetector(
         }
 
         when (state) {
-            TripState.IDLE -> maybeArmTrip(sample, gear, soc, odometer)
+            TripState.IDLE -> maybeArmTrip(sample, gear, soc, odometer, selectedAmbientTemperatureC(snapshot))
             TripState.ARMED -> handleArmed(sample, gear, speed, odometer)
             TripState.ACTIVE -> handleActive(sample, gear, speed)
             TripState.PENDING_END -> handlePendingEnd(sample, gear, speed, odometer, plugConnected || charging)
@@ -265,7 +266,7 @@ class TripSessionDetector(
         uncertaintyMillis = 0L
     )
 
-    private fun maybeArmTrip(sample: SignalSample, gear: Int?, soc: Float?, odometer: Float?) {
+    private fun maybeArmTrip(sample: SignalSample, gear: Int?, soc: Float?, odometer: Float?, ambientTempC: Float?) {
         val previous = previousGear
         // Arm on entering Drive from any non-Drive gear. The common real-world
         // departure is Park -> Reverse -> Drive (backing out of a spot first);
@@ -291,6 +292,7 @@ class TripSessionDetector(
                 startOdometerKm = odometer,
                 startGear = gear,
                 startLocation = locationProvider(),
+                startAmbientTempC = ambientTempC,
                 status = "ARMED"
             )
             activeSessionId?.let { id ->
