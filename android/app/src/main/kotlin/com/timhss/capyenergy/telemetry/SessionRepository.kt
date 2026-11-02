@@ -93,7 +93,8 @@ class SessionRepository(
         startOdometerKm: Float?,
         startGear: Int?,
         startLocation: LocationSnapshot?,
-        status: String
+        status: String,
+        startAmbientTempC: Float?
     ): String {
         val id = UUID.randomUUID().toString()
         val now = System.currentTimeMillis()
@@ -113,6 +114,7 @@ class SessionRepository(
                 startSocPercent = startSoc,
                 startOdometerKm = startOdometerKm,
                 startGear = startGear,
+                startAmbientTempC = startAmbientTempC,
                 startLatitude = startLocation?.latitude,
                 startLongitude = startLocation?.longitude,
                 startAltitudeM = startLocation?.altitudeM,
