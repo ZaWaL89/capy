@@ -219,6 +219,8 @@ class SessionRepository(
                 endOdometerKm = endOdometerKm,
                 startGear = startGear,
                 endReason = reason.name,
+                startAmbientTempC = existing?.startAmbientTempC,
+                meanAmbientTempC = existing?.startAmbientTempC,
                 createdAtUtcMillis = existing?.createdAtUtcMillis ?: now,
                 updatedAtUtcMillis = now
             )
