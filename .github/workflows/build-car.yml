@@ -31,7 +31,7 @@ jobs:
 
       - name: Bump build number
         run: |
-          sed -i 's/^version: .*/version: 0.26.0+807/' pubspec.yaml
+          sed -i 's/^version: .*/version: 0.26.0+808/' pubspec.yaml
 
       - name: Create .env
         run: |
