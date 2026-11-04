@@ -148,7 +148,9 @@ class SessionRepository(
         startOdometerKm: Float?,
         endOdometerKm: Float?,
         startGear: Int?,
-        reason: TripEndReason
+        reason: TripEndReason,
+        meanAmbientTempC: Float?,
+        endAmbientTempC: Float?
     ) {
         val sessionId = id ?: UUID.randomUUID().toString()
         val started = startedAt ?: endedAt
@@ -220,7 +222,8 @@ class SessionRepository(
                 startGear = startGear,
                 endReason = reason.name,
                 startAmbientTempC = existing?.startAmbientTempC,
-                meanAmbientTempC = existing?.startAmbientTempC,
+                endAmbientTempC = endAmbientTempC,
+                meanAmbientTempC = meanAmbientTempC ?: existing?.startAmbientTempC,
                 createdAtUtcMillis = existing?.createdAtUtcMillis ?: now,
                 updatedAtUtcMillis = now
             )
