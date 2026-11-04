@@ -51,7 +51,9 @@ interface TripSessionStore {
         startOdometerKm: Float?,
         endOdometerKm: Float?,
         startGear: Int?,
-        reason: TripEndReason
+        reason: TripEndReason,
+        meanAmbientTempC: Float? = null,
+        endAmbientTempC: Float? = null
     )
 
     fun markTripActive(id: String, movementStartedAt: SignalTimestamp)
@@ -92,6 +94,10 @@ class TripSessionDetector(
     private var lastOdometerKm: Float? = null
     private var lastSoc: Float? = null
     private var restored = false
+    private var ambientSum = 0.0
+    private var ambientCount = 0
+    private var lastAmbientTempC: Float? = null
+    private var lastAmbientSampleAtNanos = 0L
 
     fun restoreIfNeeded() {
         if (restored) return
@@ -111,7 +117,10 @@ class TripSessionDetector(
         if (gear != null && gear != previousGear) {
             lastGearChangedAt = sample.timestamp
         }
-
+        if (state == TripState.ARMED || state == TripState.ACTIVE || state == TripState.PENDING_END) {
+            selectedAmbientTemperatureC(snapshot)?.let { accumulateAmbient(sample, it) }
+        }
+        
         when (state) {
             TripState.IDLE -> maybeArmTrip(sample, gear, soc, odometer, selectedAmbientTemperatureC(snapshot))
             TripState.ARMED -> handleArmed(sample, gear, speed, odometer)
@@ -451,6 +460,7 @@ class TripSessionDetector(
         armedEstimatedDistanceKm = 0.0
         armedPeakSpeedKmh = 0f
         activeSessionId = null
+        resetAmbient()
         if (sid != null) {
             sessionRepository.deleteTripSession(sid)
         }
@@ -494,6 +504,26 @@ class TripSessionDetector(
         )
     }
 
+    private fun accumulateAmbient(sample: SignalSample, ambient: Float) {
+        val nowNanos = sample.timestamp.receivedAtElapsedNanos
+        lastAmbientTempC = ambient
+        if (ambientCount > 0 &&
+            nowNanos - lastAmbientSampleAtNanos < AMBIENT_SAMPLE_INTERVAL_NANOS
+        ) {
+            return
+        }
+        ambientSum += ambient
+        ambientCount += 1
+        lastAmbientSampleAtNanos = nowNanos
+    }
+
+    private fun resetAmbient() {
+        ambientSum = 0.0
+        ambientCount = 0
+        lastAmbientTempC = null
+        lastAmbientSampleAtNanos = 0L
+    }
+    
     private fun endTrip(sample: SignalSample, reason: TripEndReason) {
         endTripAt(sample.timestamp, sample, reason)
     }
@@ -509,7 +539,9 @@ class TripSessionDetector(
             startOdometerKm = provisionalOdometer,
             endOdometerKm = lastOdometerKm,
             startGear = armedGear,
-            reason = reason
+            reason = reason,
+            meanAmbientTempC = if (ambientCount > 0) (ambientSum / ambientCount).toFloat() else null,
+            endAmbientTempC = lastAmbientTempC
         )
         eventRepository.appendEvent(
             eventRepository.sessionEvent(
@@ -523,6 +555,7 @@ class TripSessionDetector(
         )
         state = TripState.IDLE
         activeSessionId = null
+        resetAmbient()
         armedAt = null
         armedGear = null
         provisionalSoc = null
@@ -568,5 +601,6 @@ class TripSessionDetector(
         private const val LONG_LOW_SPEED_PEAK_KMH = 8f
         private const val MAX_MOVEMENT_SAMPLE_GAP_SECONDS = 10.0
         private const val STALE_OPEN_SESSION_THRESHOLD_MILLIS = 24L * 60L * 60L * 1_000L
+        private const val AMBIENT_SAMPLE_INTERVAL_NANOS = 30_000_000_000L
     }
 }
