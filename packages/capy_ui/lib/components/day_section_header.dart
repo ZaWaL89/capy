@@ -67,7 +67,7 @@ class DaySectionHeader extends StatelessWidget {
     final tripLabel = switch (lang) {
       'en' => group.tripCount == 1 ? '1 trip' : '${group.tripCount} trips',
       'es' => group.tripCount == 1 ? '1 viaje' : '${group.tripCount} viajes',
-      'ru' => group.tripCount == 1 ? '1 поездка' : '${group.tripCount} поездок',
+      'ru' => _ruTrips(group.tripCount),
       _ => group.tripCount == 1 ? '1 viagem' : '${group.tripCount} viagens',
     };
     final distStr = group.totalDistanceKm.toStringAsFixed(
@@ -96,4 +96,14 @@ class DaySectionHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+String _ruTrips(int n) {
+  final mod10 = n % 10;
+  final mod100 = n % 100;
+  if (mod10 == 1 && mod100 != 11) return '$n поездка';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return '$n поездки';
+  }
+  return '$n поездок';
 }
