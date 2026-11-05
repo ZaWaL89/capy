@@ -19,9 +19,9 @@ class TripSessionCard extends StatelessWidget {
     required this.capabilities,
     this.onTap,
     this.selected = false,
-    this.distanceUnit = 'km',
-    this.energyUnit = 'kWh',
-    this.speedUnit = 'km/h',
+    this.distanceUnit = 'км',
+    this.energyUnit = 'кВт·ч',
+    this.speedUnit = 'км/ч',
     super.key,
   });
 
@@ -135,21 +135,21 @@ class _CompactTripCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatColumn(
-                  label: 'DIST.',
+                  label: 'РАССТ.',
                   value: distStr,
                   unit: distanceUnit,
                 ),
               ),
               Expanded(
                 child: _StatColumn(
-                  label: 'ENERGIA LÍQ.',
+                  label: 'РАСХОД',
                   value: energyStr,
                   unit: energyUnit,
                 ),
               ),
               Expanded(
                 child: _StatColumn(
-                  label: 'MÉDIA',
+                  label: 'СР.СКОРОСТЬ',
                   value: speedStr,
                   unit: speedUnit,
                 ),
@@ -244,25 +244,25 @@ class _ExpandedTripCard extends StatelessWidget {
                     icon: Icons.straighten,
                     value: distStr,
                     unit: distanceUnit,
-                    label: 'DISTÂNCIA',
+                    label: 'РАССТОЯНИЕ',
                   ),
                   _MetricRow(
                     icon: Icons.bolt,
                     value: energyStr,
                     unit: energyUnit,
-                    label: 'ENERGIA LÍQ.',
+                    label: 'РАСХОД',
                   ),
                   _MetricRow(
                     icon: Icons.speed,
                     value: speedStr,
                     unit: speedUnit,
-                    label: 'MÉDIA',
+                    label: 'СР.СКОРОСТЬ',
                   ),
                   _MetricRow(
                     icon: Icons.timer_outlined,
                     value: durationStr,
                     unit: '',
-                    label: 'DURAÇÃO',
+                    label: 'ДЛИТЕЛЬНОСТЬ',
                   ),
                 ],
               ),
@@ -345,7 +345,7 @@ class _TripTimeline extends StatelessWidget {
               child: Text(
                 entry.displayEndLocation.isNotEmpty
                     ? entry.displayEndLocation
-                    : 'Destino',
+                    : 'Место назначения',
                 style: AppText.bodyStrong.copyWith(color: colors.ink),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -503,8 +503,8 @@ String _formatClock(int? millis, BuildContext context) {
 
 String _formatDurationMinutes(int millis) {
   final totalMin = (millis / 60000).round();
-  if (totalMin < 60) return '$totalMin min';
+  if (totalMin < 60) return '$totalMin мин';
   final h = totalMin ~/ 60;
   final m = totalMin % 60;
-  return '$h h $m min';
+  return '$h ч $m мин';
 }
