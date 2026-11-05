@@ -184,7 +184,12 @@ class SessionMosaic extends StatelessWidget {
         value: detail.estimatedTripCost == null
             ? '--'
             : detail.estimatedTripCost!.toStringAsFixed(2),
-        unit: detail.lastChargeCostCurrency,
+        unit: detail.estimatedTripCost == null
+            ? null
+            : chargeCurrencySymbolForLocale(
+                loc.localeName,
+                fallbackCurrency: detail.lastChargeCostCurrency ?? 'BRL',
+              ),
         icon: Icons.payments,
       ),
     ];
