@@ -416,7 +416,7 @@ class _PlacesButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SoftActionTile(
       key: const Key('insights-places-button'),
-      label: 'Consultar locais',
+      label: 'Просмотр мест',
       icon: Icons.place,
       onPressed: () {
         Navigator.of(context).push(
