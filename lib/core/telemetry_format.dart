@@ -48,8 +48,8 @@ String formatDateTime(DateTime value) {
 }
 
 String formatTripListDateTime(DateTime value) {
-  return '${twoDigits(value.day)}/${twoDigits(value.month)}/${value.year} '
-      'às ${twoDigits(value.hour)}:${twoDigits(value.minute)}';
+  return '${twoDigits(value.day)}/${twoDigits(value.month)}/${value.year}, '
+      '${twoDigits(value.hour)}:${twoDigits(value.minute)}';
 }
 
 String formatSessionEventDate(DateTime value, AppLocalizations loc) {
@@ -82,6 +82,7 @@ String formatUpdated(int millis) {
 }
 
 String statusLabel(String status, AppLocalizations loc) {
+  final ru = loc.localeName.toLowerCase().startsWith('ru');
   switch (status.toUpperCase()) {
     case 'ACTIVE':
       return loc.tripStatusActive;
@@ -89,6 +90,14 @@ String statusLabel(String status, AppLocalizations loc) {
       return loc.statusComplete;
     case 'PENDING_END':
       return loc.tripStatusPendingEnd;
+    case 'DISCONNECTED':
+      return ru ? 'Отключено' : 'DISCONNECTED';
+    case 'ENDED_WAITING_DISCONNECT':
+      return ru ? 'Завершено, ждёт отключения' : 'ENDED_WAITING_DISCONNECT';
+    case 'CHARGING':
+      return ru ? 'Идёт зарядка' : 'CHARGING';
+    case 'PLUG_CONNECTED':
+      return ru ? 'Кабель подключён' : 'PLUG_CONNECTED';
     default:
       return status.toUpperCase();
   }
