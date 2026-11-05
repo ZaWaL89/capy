@@ -89,15 +89,15 @@ String chargeCurrencySymbolForLocale(
 }) {
   final locale = (localeName ?? '').toLowerCase();
   if (locale.startsWith('pt')) return 'R\$';
-  if (locale.startsWith('ru')) return '₽';
+  if (locale.startsWith('ru')) return 'BYN';
   if (locale.startsWith('en')) return '\$';
   if (locale.startsWith('es')) return '\$';
 
   switch (fallbackCurrency.toUpperCase()) {
     case 'BRL':
       return 'R\$';
-    case 'RUB':
-      return '₽';
+    case 'BYN':
+      return 'BYN';
     case 'USD':
       return '\$';
     default:
