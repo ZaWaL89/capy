@@ -265,36 +265,46 @@ class _MosaicCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeColors.of(context);
     final onPressed = tile.onPressed;
-    if (onPressed == null) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.x4),
-        decoration: BoxDecoration(
-          color: colors.control,
-          borderRadius: AppRadii.mdRadius,
-        ),
-        child: _content(context),
-      );
-    }
-    // The cell's own context is the anchor, so the editor opens beside this
-    // tile. `Builder` is what gives the callback a context under the ink,
-    // rather than the one the whole mosaic was built in.
-    return Semantics(
-      button: true,
-      label: tile.editLabel,
-      child: Material(
-        color: colors.control,
-        borderRadius: AppRadii.mdRadius,
-        child: Builder(
-          builder: (cellContext) => InkWell(
-            onTap: () => onPressed(cellContext),
+    return LayoutBuilder(
+      builder: (context, box) {
+        // A short cell (the docked history card is a quarter of the screen
+        // tall) cannot afford the full padding: it would leave the numeral
+        // no height at all and only the caption would show.
+        final compact = box.hasBoundedHeight && box.maxHeight < 90;
+        final padding = compact
+            ? const EdgeInsets.symmetric(horizontal: 8, vertical: 3)
+            : const EdgeInsets.all(AppSpacing.x4);
+        if (onPressed == null) {
+          return Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              color: colors.control,
+              borderRadius: AppRadii.mdRadius,
+            ),
+            child: _content(context),
+          );
+        }
+        // The cell's own context is the anchor, so the editor opens beside
+        // this tile.
+        return Semantics(
+          button: true,
+          label: tile.editLabel,
+          child: Material(
+            color: colors.control,
             borderRadius: AppRadii.mdRadius,
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.x4),
-              child: _content(cellContext),
+            child: Builder(
+              builder: (cellContext) => InkWell(
+                onTap: () => onPressed(cellContext),
+                borderRadius: AppRadii.mdRadius,
+                child: Padding(
+                  padding: padding,
+                  child: _content(cellContext),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
