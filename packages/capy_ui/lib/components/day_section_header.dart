@@ -14,10 +14,10 @@ class DaySectionHeader extends StatelessWidget {
   const DaySectionHeader({
     required this.group,
     this.title,
-    this.todayLabel = 'Hoje',
-    this.yesterdayLabel = 'Ontem',
-    this.distanceUnit = 'km',
-    this.energyUnit = 'kWh',
+    this.todayLabel = 'Сегодня',
+    this.yesterdayLabel = 'Вчера',
+    this.distanceUnit = 'км',
+    this.energyUnit = 'кВт⋅ч',
     super.key,
   });
 
