@@ -138,7 +138,7 @@ String rangePerEnergyLabel(double? value) {
 
 String energyLabel(double? value) {
   if (value == null) return '--';
-  return '${value.toStringAsFixed(2)} kWh';
+  return '${value.toStringAsFixed(2)} кВт·ч';
 }
 
 String liveNumber(double? value, String unit, {required int decimals}) {
@@ -213,7 +213,7 @@ String ambientTempRangeLabel(double? start, double? end) {
 /// Climb, as a whole metre. Null stays `--`.
 String altitudeGainLabel(double? metres) {
   if (metres == null || !metres.isFinite) return '--';
-  return '+${metres.round()} m';
+  return '+${metres.round()} м';
 }
 
 /// Whole degrees for a `TiltGauge` readout (`3°`, `-2°`, `0°`).
