@@ -191,7 +191,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
     final state = _query.state;
     return Scaffold(
       backgroundColor: AppThemeColors.of(context).canvas,
-      appBar: AppBar(title: const Text('Consultar locais')),
+      appBar: AppBar(title: const Text('Просмотр мест')),
       body: PlacesBody(
         state: state,
         capabilities: capabilities,
