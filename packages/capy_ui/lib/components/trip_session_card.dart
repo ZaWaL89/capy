@@ -307,7 +307,7 @@ class _TripTimeline extends StatelessWidget {
               child: Text(
                 entry.displayStartLocation.isNotEmpty
                     ? entry.displayStartLocation
-                    : 'Ponto de partida',
+                    : 'Начало',
                 style: AppText.bodyStrong.copyWith(color: colors.ink),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
