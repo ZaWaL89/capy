@@ -92,7 +92,7 @@ class _TripHistoryPaneState extends State<TripHistoryPane> {
           ),
           child: SoftActionTile(
             key: const Key('history-places-button'),
-            label: 'Consultar locais',
+            label: 'Просмотр мест',
             icon: Icons.place,
             onPressed: () {
               Navigator.of(context).push(
