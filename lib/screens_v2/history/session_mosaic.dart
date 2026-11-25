@@ -96,6 +96,7 @@ class SessionMosaic extends StatelessWidget {
     required double? endSoc,
     required double? startTempC,
     required double? endTempC,
+    MosaicTileSpan temperatureSpan = MosaicTileSpan.wide,
   }) {
     return [
       MosaicTile(
@@ -127,9 +128,12 @@ class SessionMosaic extends StatelessWidget {
       ),
       MosaicTile(
         caption: loc.v2HistoryTemperature,
-        value: ambientTempRangeLabel(startTempC, endTempC),
+        // A one-cell tile has no room for a start-to-end range.
+        value: temperatureSpan == MosaicTileSpan.small
+            ? ambientTempLabel(startTempC ?? endTempC)
+            : ambientTempRangeLabel(startTempC, endTempC),
         icon: Icons.thermostat,
-        span: MosaicTileSpan.wide,
+        span: temperatureSpan,
       ),
     ];
   }
@@ -201,6 +205,8 @@ class SessionMosaic extends StatelessWidget {
     AppThemeColors colors,
   ) {
     final session = detail.session;
+    final odometerKm =
+        session.startOdometer.displayValue ?? session.endOdometer.displayValue;
     final energyKwh = detail.estimatedEnergyKwh;
     // The receipt when there is one, and the rate times the energy when there
     // is not — the same figure the charging screen states for this session, so
@@ -253,6 +259,13 @@ class SessionMosaic extends StatelessWidget {
         endSoc: session.endSoc.displayValue,
         startTempC: session.startAmbientTemp.displayValue,
         endTempC: session.endAmbientTemp.displayValue,
+        temperatureSpan: MosaicTileSpan.small,
+      ),
+      MosaicTile(
+        caption: 'Пробег',
+        value: odometerKm == null ? '--' : odometerKm.round().toString(),
+        unit: odometerKm == null ? null : loc.unitKm,
+        icon: Icons.straighten,
       ),
       MosaicTile(
         caption: loc.v2HistoryCost,
