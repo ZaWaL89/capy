@@ -216,7 +216,7 @@ class _TripDetailScreenState
               side: ChartTooltipSide.none,
               title: columnLabel(bucket, origin),
               value: formatWh(bucket.drawnWh),
-              unit: 'Wh',
+              unit: 'Вт·ч',
               rows: [
                 if (bucket.climateWh > 0.5)
                   ChartTooltipRow(
@@ -284,8 +284,8 @@ class _TripDetailScreenState
         colors,
         SeriesTrace(
           points: altitude.points,
-          minLabel: '${altitude.low.round()} m',
-          maxLabel: '${altitude.high.round()} m',
+          minLabel: '${altitude.low.round()} м',
+          maxLabel: '${altitude.high.round()} м',
           color: colors.ink,
           semanticsLabel: l10n.historyAltitude,
         ),
