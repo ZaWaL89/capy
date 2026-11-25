@@ -186,7 +186,7 @@ class _ChargeDetailScreenState
     return (bucket.deliveredWh / 1000.0) / (bucket.integratedSeconds / 3600.0);
   }
 
-  /// The battery voltage and SOC traces during a charge.
+  /// The battery voltage, SOC and power traces during a charge.
   Widget? _tracesCard(
     ChargeDetailReading detail,
     AppLocalizations l10n,
@@ -194,7 +194,8 @@ class _ChargeDetailScreenState
   ) {
     final soc = traceSeries(detail.socSeries);
     final voltage = traceSeries(detail.voltageSeries);
-    if (soc == null && voltage == null) return null;
+    final power = traceSeries(detail.powerSeries);
+    if (soc == null && voltage == null && power == null) return null;
 
     return AppCard(
       title: l10n.historyBattery,
@@ -213,7 +214,7 @@ class _ChargeDetailScreenState
                 semanticsLabel: l10n.historySoc,
               ),
             ),
-          if (soc != null && voltage != null)
+          if (soc != null && (voltage != null || power != null))
             const SizedBox(height: AppSpacing.x4),
           if (voltage != null)
             labelled(
@@ -225,6 +226,20 @@ class _ChargeDetailScreenState
                 maxLabel: '${voltage.high.round()} V',
                 color: colors.energy.focus,
                 semanticsLabel: l10n.historyVoltage,
+              ),
+            ),
+          if (voltage != null && power != null)
+            const SizedBox(height: AppSpacing.x4),
+          if (power != null)
+            labelled(
+              'Мощность',
+              colors,
+              SeriesTrace(
+                points: power.points,
+                minLabel: '${power.low.toStringAsFixed(1)} кВт',
+                maxLabel: '${power.high.toStringAsFixed(1)} кВт',
+                color: colors.energy.draw,
+                semanticsLabel: 'Мощность',
               ),
             ),
         ],
