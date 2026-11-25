@@ -337,6 +337,20 @@ class _TripDetailScreenState
         value: formatTemperature(detail.meanAmbientTempC),
         unit: '°C',
       ),
+      if (detail.session.startOdometer.displayValue != null)
+        MosaicTile(
+          caption: 'Пробег нач.',
+          value: detail.session.startOdometer.displayValue!
+              .round()
+              .toString(),
+          unit: 'км',
+        ),
+      if (detail.session.endOdometer.displayValue != null)
+        MosaicTile(
+          caption: 'Проебег кон.',
+          value: detail.session.endOdometer.displayValue!.round().toString(),
+          unit: 'км',
+        ),
     ];
   }
 }
