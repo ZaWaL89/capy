@@ -308,6 +308,8 @@ class _ChargeDetailScreenState
     final ambientTemp =
         charge.meanAmbientTemp.displayValue ??
         charge.startAmbientTemp.displayValue;
+    final odometerKm =
+        charge.startOdometer.displayValue ?? charge.endOdometer.displayValue;
 
     final peakPower = detail.peakPowerKw;
     final averagePower = detail.averagePowerKw;
@@ -341,32 +343,32 @@ class _ChargeDetailScreenState
       MosaicTile(
         caption: l10n.historyEnergy,
         value: formatEnergy(detail.estimatedEnergyKwh),
-        unit: 'kWh',
+        unit: 'кВт·ч',
       ),
       if (showCombinedPower)
         MosaicTile(
           caption: l10n.historyPeakAndAverage,
           value: peakStr,
-          unit: 'kW',
+          unit: 'кВт',
         )
       else ...[
         if (peakStr != null)
           MosaicTile(
             caption: l10n.historyPeakPower,
             value: peakStr,
-            unit: 'kW',
+            unit: 'кВт',
           ),
         if (avgStr != null)
           MosaicTile(
             caption: l10n.historyAveragePower,
             value: avgStr,
-            unit: 'kW',
+            unit: 'кВт',
           ),
         if (peakStr == null && avgStr == null)
           MosaicTile(
             caption: l10n.historyPeakPower,
             value: kNoValue,
-            unit: 'kW',
+            unit: 'кВт',
           ),
       ],
       if (ambientTemp != null)
@@ -374,6 +376,12 @@ class _ChargeDetailScreenState
           caption: l10n.historyTemperature,
           value: formatTemperature(ambientTemp),
           unit: '°C',
+        ),
+      if (odometerKm != null)
+        MosaicTile(
+          caption: 'Пробег',
+          value: odometerKm.round().toString(),
+          unit: 'км',
         ),
       MosaicTile(
         caption: l10n.historyChargeCost,
