@@ -352,23 +352,18 @@ class _SyncV2ScreenState extends State<SyncV2Screen> {
     return loc.v2SyncProgressPendingClock(clock);
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.gridGutter),
-      child: TwoColumnLayout(
-        primary: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _codeCard(loc),
-              const SizedBox(height: AppSpacing.gridGutter),
-              _cloudSyncCard(loc),
-            ],
-          ),
-        ),
-        trailing: _companionBetaCard(loc),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: SingleChildScrollView(child: _codeCard(loc))),
+          const SizedBox(width: AppSpacing.gridGutter),
+          Expanded(child: SingleChildScrollView(child: _cloudSyncCard(loc))),
+        ],
       ),
     );
   }
