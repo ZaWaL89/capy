@@ -11,10 +11,20 @@ import 'package:intl/intl.dart';
 /// reading is not a zero.
 const kNoValue = '--';
 
+/// Formats [at] with [pattern] in Russian, falling back to the default locale
+/// when the Russian date data is not loaded, so a screen never fails on a date.
+String _formatDate(String pattern, DateTime at) {
+  try {
+    return DateFormat(pattern, 'ru').format(at);
+  } catch (_) {
+    return DateFormat(pattern).format(at);
+  }
+}
+
 String formatDateTime(int? millis) {
   if (millis == null || millis <= 0) return kNoValue;
   final at = DateTime.fromMillisecondsSinceEpoch(millis);
-  return DateFormat('d MMM, HH:mm').format(at);
+  return _formatDate('d MMM, HH:mm', at);
 }
 
 String formatClock(int? millis) {
@@ -27,8 +37,8 @@ String formatDuration(int? millis) {
   final total = Duration(milliseconds: millis);
   final hours = total.inHours;
   final minutes = total.inMinutes % 60;
-  if (hours == 0) return '$minutes min';
-  return '$hours h $minutes min';
+  if (hours == 0) return '$minutes мин';
+  return '$hours ч $minutes мин';
 }
 
 String formatDistance(double? km) {
@@ -75,12 +85,12 @@ String formatDateRange(int? startMillis, int? endMillis) {
   if (startMillis == null || endMillis == null) return kNoValue;
   final start = DateTime.fromMillisecondsSinceEpoch(startMillis);
   final end = DateTime.fromMillisecondsSinceEpoch(endMillis);
-  final startStr = DateFormat('d MMM, HH:mm').format(start);
+  final startStr = _formatDate('d MMM, HH:mm', start);
   final endStr =
       (start.year == end.year &&
           start.month == end.month &&
           start.day == end.day)
       ? DateFormat('HH:mm').format(end)
-      : DateFormat('d MMM, HH:mm').format(end);
+      : _formatDate('d MMM, HH:mm', end);
   return '$startStr – $endStr';
 }
