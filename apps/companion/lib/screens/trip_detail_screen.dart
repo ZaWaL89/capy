@@ -303,7 +303,7 @@ class _TripDetailScreenState
       MosaicTile(
         caption: l10n.historyDistance,
         value: formatDistance(detail.distanceKm),
-        unit: 'km',
+        unit: 'км',
       ),
       MosaicTile(
         caption: l10n.historySoc,
@@ -315,22 +315,22 @@ class _TripDetailScreenState
       MosaicTile(
         caption: l10n.historyConsumed,
         value: formatEnergy(detail.netEnergyKwh),
-        unit: 'kWh',
+        unit: 'кВт·ч',
       ),
       MosaicTile(
         caption: l10n.historyRegenerated,
         value: formatEnergy(detail.regeneratedKwh),
-        unit: 'kWh',
+        unit: 'кВт·ч',
       ),
       MosaicTile(
         caption: l10n.historyEfficiency,
         value: formatWhPerKm(detail.efficiencyWhPerKm),
-        unit: 'Wh/km',
+        unit: 'Вт·ч/км',
       ),
       MosaicTile(
         caption: l10n.historyClimb,
         value: formatAltitudeGain(detail.altitudeGainM),
-        unit: 'm',
+        unit: 'м',
       ),
       MosaicTile(
         caption: l10n.historyTemperature,
@@ -347,7 +347,7 @@ class _TripDetailScreenState
         ),
       if (detail.session.endOdometer.displayValue != null)
         MosaicTile(
-          caption: 'Проебег кон.',
+          caption: 'Пробег кон.',
           value: detail.session.endOdometer.displayValue!.round().toString(),
           unit: 'км',
         ),
