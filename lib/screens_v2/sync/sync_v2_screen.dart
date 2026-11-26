@@ -352,18 +352,31 @@ class _SyncV2ScreenState extends State<SyncV2Screen> {
     return loc.v2SyncProgressPendingClock(clock);
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.gridGutter),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: SingleChildScrollView(child: _codeCard(loc))),
-          const SizedBox(width: AppSpacing.gridGutter),
-          Expanded(child: SingleChildScrollView(child: _cloudSyncCard(loc))),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Each card stretches to the full height of the area (like the
+          // companion card used to) and scrolls only when its content is
+          // taller than that.
+          Widget fill(Widget card) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: card,
+            ),
+          );
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: fill(_cloudSyncCard(loc))),
+              const SizedBox(width: AppSpacing.gridGutter),
+              Expanded(child: fill(_codeCard(loc))),
+            ],
+          );
+        },
       ),
     );
   }
