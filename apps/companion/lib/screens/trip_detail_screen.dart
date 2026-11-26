@@ -295,6 +295,17 @@ class _TripDetailScreenState
 
   List<MosaicTile> _tripTiles(TripDetailReading detail, AppLocalizations l10n) {
     final session = widget.session;
+    final startOdo = session.startOdometer.displayValue;
+    final endOdo = session.endOdometer.displayValue;
+    final distanceKm = detail.distanceKm;
+    final durationMs = detail.durationMillis;
+    final avgSpeedKmh =
+        (distanceKm != null &&
+            distanceKm > 0 &&
+            durationMs != null &&
+            durationMs > 0)
+        ? distanceKm / (durationMs / 3600000)
+        : null;
     return [
       MosaicTile(
         caption: l10n.historyDuration,
@@ -304,6 +315,11 @@ class _TripDetailScreenState
         caption: l10n.historyDistance,
         value: formatDistance(detail.distanceKm),
         unit: 'км',
+      ),
+        MosaicTile(
+        caption: 'Ср. скорость',
+        value: avgSpeedKmh == null ? kNoValue : avgSpeedKmh.round().toString(),
+        unit: avgSpeedKmh == null ? null : 'км/ч',
       ),
       MosaicTile(
         caption: l10n.historySoc,
