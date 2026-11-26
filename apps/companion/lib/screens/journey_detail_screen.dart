@@ -224,19 +224,19 @@ class _JourneyDetailScreenState extends State<JourneyDetailScreen> {
                         value: formatDistance(
                           data.reading.distanceKm.displayValue,
                         ),
-                        unit: 'km',
+                        unit: 'км',
                       ),
                       MosaicTile(
                         caption: l10n.historyConsumed,
                         value: formatEnergy(data.reading.netKwh.displayValue),
-                        unit: 'kWh',
+                        unit: 'кВт·ч',
                       ),
                       MosaicTile(
-                        caption: l10n.historyRecovered,
+                        caption: 'Заряжено',
                         value: formatEnergy(
                           data.reading.deliveredKwh.displayValue,
                         ),
-                        unit: 'kWh',
+                        unit: 'кВт·ч',
                       ),
                       MosaicTile(
                         caption: l10n.historyTrips,
@@ -247,10 +247,11 @@ class _JourneyDetailScreenState extends State<JourneyDetailScreen> {
                         value: '${data.reading.chargeCount}',
                       ),
                       if (data.reading.chargesCost != null)
-                        MosaicTile(
-                          caption: l10n.journeyCost,
-                          value: formatEnergy(data.reading.chargesCost),
-                        ),
+                      MosaicTile(
+                        caption: l10n.journeyCost,
+                        value: formatEnergy(data.reading.chargesCost),
+                        unit: chargeCurrencySymbolForLocale(l10n.localeName),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppSpacing.x6),
