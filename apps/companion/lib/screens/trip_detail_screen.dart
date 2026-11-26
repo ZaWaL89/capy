@@ -316,7 +316,7 @@ class _TripDetailScreenState
         value: formatDistance(detail.distanceKm),
         unit: 'км',
       ),
-        MosaicTile(
+      MosaicTile(
         caption: 'Ср. скорость',
         value: avgSpeedKmh == null ? kNoValue : avgSpeedKmh.round().toString(),
         unit: avgSpeedKmh == null ? null : 'км/ч',
@@ -353,19 +353,14 @@ class _TripDetailScreenState
         value: formatTemperature(detail.meanAmbientTempC),
         unit: '°C',
       ),
-      if (detail.session.startOdometer.displayValue != null)
+      if (startOdo != null || endOdo != null)
         MosaicTile(
-          caption: 'Пробег нач.',
-          value: detail.session.startOdometer.displayValue!
-              .round()
-              .toString(),
+          caption: 'Пробег',
+          value:
+              '${startOdo == null ? kNoValue : startOdo.round()} → '
+              '${endOdo == null ? kNoValue : endOdo.round()}',
           unit: 'км',
-        ),
-      if (detail.session.endOdometer.displayValue != null)
-        MosaicTile(
-          caption: 'Пробег кон.',
-          value: detail.session.endOdometer.displayValue!.round().toString(),
-          unit: 'км',
+          span: MosaicTileSpan.wide,
         ),
     ];
   }
