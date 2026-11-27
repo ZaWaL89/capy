@@ -103,6 +103,12 @@ class _CompactTripCard extends StatelessWidget {
     final speedStr = entry.avgSpeedKmh != null
         ? entry.avgSpeedKmh!.round().toString()
         : '--';
+    final per100Str =
+        (entry.netEnergyKwh != null &&
+            entry.distanceKm != null &&
+            entry.distanceKm! >= 0.1)
+        ? (entry.netEnergyKwh! / entry.distanceKm! * 100).toStringAsFixed(1)
+        : '--';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -125,7 +131,7 @@ class _CompactTripCard extends StatelessWidget {
         ),
         // Divider
         Divider(height: 1, color: colors.divider),
-        // 3-column stats bar
+        // 4-column stats bar
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.x4,
@@ -142,9 +148,16 @@ class _CompactTripCard extends StatelessWidget {
               ),
               Expanded(
                 child: _StatColumn(
-                  label: 'РАСХОД',
+                  label: 'ПОТРАЧЕНО',
                   value: energyStr,
                   unit: energyUnit,
+                ),
+              ),
+              Expanded(
+                child: _StatColumn(
+                  label: 'РАСХОД',
+                  value: per100Str,
+                  unit: '$energyUnit/100 $distanceUnit',
                 ),
               ),
               Expanded(
