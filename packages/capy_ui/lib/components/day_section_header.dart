@@ -74,8 +74,14 @@ class DaySectionHeader extends StatelessWidget {
       group.totalDistanceKm >= 100 ? 0 : 1,
     );
     final energyStr = group.totalNetKwh.toStringAsFixed(2);
+    final per100Suffix =
+        (group.totalDistanceKm >= 0.1 && group.totalNetKwh > 0)
+        ? ' • ${(group.totalNetKwh / group.totalDistanceKm * 100).toStringAsFixed(1)} '
+              '$energyUnit/100 $distanceUnit'
+        : '';
     final summarySubtitle =
-        '$tripLabel • $distStr $distanceUnit • $energyStr $energyUnit';
+        '$tripLabel • $distStr $distanceUnit • $energyStr $energyUnit'
+        '$per100Suffix';
 
     return Padding(
       padding: const EdgeInsets.symmetric(
