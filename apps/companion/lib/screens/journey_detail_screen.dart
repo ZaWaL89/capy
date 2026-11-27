@@ -129,6 +129,106 @@ class _JourneyDetailScreenState extends State<JourneyDetailScreen> {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => target));
   }
 
+  List<MosaicTile> _journeyTiles(
+    ({
+      Journey journey,
+      List<SessionRecord> sessions,
+      JourneyReading reading,
+    })
+    data,
+    AppLocalizations l10n,
+  ) {
+    final reading = data.reading;
+    final distanceKm = reading.distanceKm.displayValue;
+    final netKwh = reading.netKwh.displayValue;
+
+    // Average speed over the time spent driving (trips only).
+    var drivingMs = 0;
+    for (final session in data.sessions) {
+      if (session.kind == SessionKind.trip) {
+        drivingMs += sessionReadingDurationMillis(session) ?? 0;
+      }
+    }
+    final avgSpeedKmh =
+        (distanceKm != null && distanceKm > 0 && drivingMs > 0)
+        ? distanceKm / (drivingMs / 3600000)
+        : null;
+
+    final per100 =
+        (distanceKm != null &&
+            distanceKm >= 0.1 &&
+            netKwh != null &&
+            netKwh > 0)
+        ? netKwh / distanceKm * 100
+        : null;
+
+    // Odometer only grows, so the lowest reading is where the journey began
+    // and the highest is where it ended.
+    final odometers = <num>[
+      for (final session in data.sessions) ...[
+        if (session.startOdometer.displayValue != null)
+          session.startOdometer.displayValue!,
+        if (session.endOdometer.displayValue != null)
+          session.endOdometer.displayValue!,
+      ],
+    ];
+    final startOdo = odometers.isEmpty
+        ? null
+        : odometers.reduce((a, b) => a < b ? a : b);
+    final endOdo = odometers.isEmpty
+        ? null
+        : odometers.reduce((a, b) => a > b ? a : b);
+
+    return [
+      MosaicTile(
+        caption: l10n.historyDistance,
+        value: formatDistance(distanceKm),
+        unit: 'км',
+      ),
+      if (startOdo != null && endOdo != null)
+        MosaicTile(
+          caption: 'Пробег',
+          value: '${startOdo.round()} → ${endOdo.round()}',
+          unit: 'км',
+          span: MosaicTileSpan.wide,
+        ),
+      MosaicTile(
+        caption: 'Ср. скорость',
+        value: avgSpeedKmh == null ? kNoValue : avgSpeedKmh.round().toString(),
+        unit: avgSpeedKmh == null ? null : 'км/ч',
+      ),
+      MosaicTile(
+        caption: 'Расход',
+        value: per100 == null ? kNoValue : per100.toStringAsFixed(1),
+        unit: per100 == null ? null : 'кВт·ч/100 км',
+      ),
+      MosaicTile(
+        caption: l10n.historyConsumed,
+        value: formatEnergy(netKwh),
+        unit: 'кВт·ч',
+      ),
+      MosaicTile(
+        caption: 'Заряжено',
+        value: formatEnergy(reading.deliveredKwh.displayValue),
+        unit: 'кВт·ч',
+      ),
+      MosaicTile(
+        caption: l10n.historyTrips,
+        value: '${reading.tripCount}',
+      ),
+      MosaicTile(
+        caption: l10n.historyCharges,
+        value: '${reading.chargeCount}',
+      ),
+      if (reading.chargesCost != null)
+        MosaicTile(
+          caption: l10n.journeyCost,
+          value: formatEnergy(reading.chargesCost),
+          unit: chargeCurrencySymbolForLocale(l10n.localeName),
+        ),
+    ];
+  }
+  
   Widget _placeholder(
     Loadable<Object?> state,
     AppLocalizations l10n,
@@ -216,44 +316,7 @@ class _JourneyDetailScreenState extends State<JourneyDetailScreen> {
                     const SizedBox(height: AppSpacing.x4),
                   ],
 
-                  MetricMosaic(
-                    columns: 3,
-                    tiles: [
-                      MosaicTile(
-                        caption: l10n.historyDistance,
-                        value: formatDistance(
-                          data.reading.distanceKm.displayValue,
-                        ),
-                        unit: 'км',
-                      ),
-                      MosaicTile(
-                        caption: l10n.historyConsumed,
-                        value: formatEnergy(data.reading.netKwh.displayValue),
-                        unit: 'кВт·ч',
-                      ),
-                      MosaicTile(
-                        caption: 'Заряжено',
-                        value: formatEnergy(
-                          data.reading.deliveredKwh.displayValue,
-                        ),
-                        unit: 'кВт·ч',
-                      ),
-                      MosaicTile(
-                        caption: l10n.historyTrips,
-                        value: '${data.reading.tripCount}',
-                      ),
-                      MosaicTile(
-                        caption: l10n.historyCharges,
-                        value: '${data.reading.chargeCount}',
-                      ),
-                      if (data.reading.chargesCost != null)
-                      MosaicTile(
-                        caption: l10n.journeyCost,
-                        value: formatEnergy(data.reading.chargesCost),
-                        unit: chargeCurrencySymbolForLocale(l10n.localeName),
-                      ),
-                    ],
-                  ),
+                  MetricMosaic(columns: 3, tiles: _journeyTiles(data, l10n)),
                   const SizedBox(height: AppSpacing.x6),
 
                   Text(
