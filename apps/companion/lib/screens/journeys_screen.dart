@@ -279,30 +279,48 @@ class _JourneyCard extends StatelessWidget {
               ),
               if (distance != null && distance > 0) ...[
                 const SizedBox(height: AppSpacing.x2),
-                Row(
+                Wrap(
+                  spacing: AppSpacing.x3,
+                  runSpacing: AppSpacing.x1,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Icon(
-                      Icons.directions_car_outlined,
-                      size: 16,
-                      color: colors.inkMuted,
-                    ),
-                    const SizedBox(width: AppSpacing.x1),
-                    Text(
-                      '${formatDistance(distance)} км',
-                      style: AppText.label.copyWith(color: colors.ink),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.directions_car_outlined,
+                          size: 16,
+                          color: colors.inkMuted,
+                        ),
+                        const SizedBox(width: AppSpacing.x1),
+                        Text(
+                          '${formatDistance(distance)} км',
+                          style: AppText.label.copyWith(color: colors.ink),
+                        ),
+                      ],
                     ),
                     if (reading.deliveredKwh.displayValue != null &&
-                        reading.deliveredKwh.displayValue! > 0) ...[
-                      const SizedBox(width: AppSpacing.x3),
-                      Icon(Icons.bolt, size: 16, color: colors.energy.gain),
-                      const SizedBox(width: AppSpacing.x1),
+                        reading.deliveredKwh.displayValue! > 0)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt, size: 16, color: colors.energy.gain),
+                          const SizedBox(width: AppSpacing.x1),
+                          Text(
+                            '${formatEnergy(reading.deliveredKwh.displayValue)} кВт·ч',
+                            style: AppText.label.copyWith(
+                              color: colors.energy.gain,
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (netEnergy != null && netEnergy > 0 && distance >= 0.1)
                       Text(
-                        '${formatEnergy(reading.deliveredKwh.displayValue)} кВт·ч',
+                        '${(netEnergy / distance * 100).toStringAsFixed(1)} кВт·ч/100 км',
                         style: AppText.label.copyWith(
-                          color: colors.energy.gain,
+                          color: colors.energy.critical,
                         ),
                       ),
-                    ],
                   ],
                 ),
               ],
