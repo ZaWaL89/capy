@@ -170,17 +170,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
       separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.x3),
       itemBuilder: (context, index) {
         final session = result.sessions[index];
+        final durationMs = sessionReadingDurationMillis(session);
+        final kwh = sessionReadingDeliveredKwh(session).displayValue;
+        final temp = session.startAmbientTemp.displayValue;
+        // Energy over duration, only for a plausible charge length: a car left
+        // plugged in overnight would otherwise show a power nobody delivered.
+        final avgKw =
+            (kwh != null &&
+                kwh > 0 &&
+                durationMs != null &&
+                durationMs > 0 &&
+                durationMs <= 3 * 3600 * 1000)
+            ? kwh / (durationMs / 3600000)
+            : null;
         return SessionRow(
           title: formatDateTime(session.startedAtUtcMillis),
-          meta: formatDuration(sessionReadingDurationMillis(session)),
-          energy: sessionRowEnergy(
-            l10n,
-            sessionReadingDeliveredKwh(session).displayValue,
-          ),
+          meta: formatDuration(durationMs),
+          energy: sessionRowEnergy(l10n, kwh),
+          energyColor: colors.energy.gain,
           soc: formatSocRange(
             session.startSoc.displayValue,
             session.endSoc.displayValue,
           ),
+          temperature: temp == null ? null : '${formatTemperature(temp)} °C',
+          power: avgKw == null ? null : '${avgKw.toStringAsFixed(1)} кВт',
           onPressed: () => _open(
             ChargeDetailScreen(
               store: widget.store,
@@ -190,8 +203,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
         );
       },
-    );
-  }
 
   /// A read with no answer yet. An error keeps its own line, because an
   /// unreachable store and an empty history are different facts.
@@ -224,7 +235,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 String? sessionRowEnergy(AppLocalizations l10n, double? kwh) =>
     kwh == null || kwh <= 0 ? null : l10n.historyRowEnergy(formatEnergy(kwh));
 
-/// One session in the list, as four readings on two lines.
+/// One session in the list, as four readings on two lines. A charge row adds
+/// the outside temperature (left) and the mean power (right).
 class SessionRow extends StatelessWidget {
   const SessionRow({
     required this.title,
@@ -232,6 +244,9 @@ class SessionRow extends StatelessWidget {
     required this.energy,
     required this.soc,
     required this.onPressed,
+    this.temperature,
+    this.power,
+    this.energyColor,
     super.key,
   });
 
@@ -240,6 +255,15 @@ class SessionRow extends StatelessWidget {
   final String? energy;
   final String soc;
   final VoidCallback onPressed;
+
+  /// Outside temperature, under the duration. Null draws no line.
+  final String? temperature;
+
+  /// Mean power, under the state of charge. Null draws no line.
+  final String? power;
+
+  /// Energy colour. Null keeps the default (the draw colour).
+  final Color? energyColor;
 
   @override
   Widget build(BuildContext context) {
@@ -252,39 +276,59 @@ class SessionRow extends StatelessWidget {
         onTap: onPressed,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.x4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       title,
                       overflow: TextOverflow.ellipsis,
                       style: AppText.bodyStrong.copyWith(color: colors.ink),
                     ),
-                  ),
-                  if (energy case final energy?)
+                    const SizedBox(height: AppSpacing.x1),
                     Text(
-                      energy,
-                      style: AppText.label.copyWith(color: colors.energy.draw),
-                    ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.x1),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
                       meta,
                       overflow: TextOverflow.ellipsis,
                       style: AppText.label.copyWith(color: colors.inkMuted),
                     ),
+                    if (temperature != null) ...[
+                      const SizedBox(height: AppSpacing.x1),
+                      Text(
+                        temperature!,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppText.label.copyWith(color: colors.inkMuted),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Keeps the line height when a row has no energy to show.
+                  Text(
+                    energy ?? ' ',
+                    style: AppText.label.copyWith(
+                      color: energyColor ?? colors.energy.draw,
+                    ),
                   ),
+                  const SizedBox(height: AppSpacing.x1),
                   Text(
                     soc,
                     style: AppText.label.copyWith(color: colors.inkMuted),
                   ),
+                  if (power != null) ...[
+                    const SizedBox(height: AppSpacing.x1),
+                    Text(
+                      power!,
+                      style: AppText.label.copyWith(
+                        color: colors.energy.draw,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ],
